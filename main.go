@@ -28,10 +28,13 @@ func main() {
 	}
 
 	for _, e := range entries {
-		if areIPs {
-			spitSubnet(e)
-		} else {
-			spitFqdn(e)
+		if e != "" {
+			if areIPs {
+				spitSubnet(e)
+			} else {
+				spitFqdn(e)
+			}
+
 		}
 	}
 }
