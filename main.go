@@ -1,26 +1,30 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"log"
-	"os"
+	"strings"
+
+	"golang.design/x/clipboard"
 )
 
 var areIPs bool
+var useClipboard bool
 
 func init() {
 	flag.BoolVar(&areIPs, "ip", false, "son ips (:")
+	flag.BoolVar(&useClipboard, "c", false, "usa el portapapeles")
 	flag.Parse()
 }
 
 func main() {
 	var entries []string
-	if len(flag.Args()) != 0 {
-		entries = flag.Args()
+
+	if useClipboard {
+		cbtext := readFromClipboard()
+		entries = strings.Split(cbtext, "\n")
 	} else {
-		entries = readFromCli()
+		entries = flag.Args()
 	}
 
 	for _, e := range entries {
@@ -32,24 +36,9 @@ func main() {
 	}
 }
 
-func readFromCli() []string {
-	scanner := bufio.NewScanner(os.Stdin)
-
-	var lines []string
-	for {
-		scanner.Scan()
-		line := scanner.Text()
-		if len(line) == 0 {
-			break
-		}
-		lines = append(lines, line)
-	}
-
-	err := scanner.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return lines
+func readFromClipboard() string {
+	cb := clipboard.Read(clipboard.FmtText)
+	return string(cb)
 }
 
 func spitFqdn(domain string) {
