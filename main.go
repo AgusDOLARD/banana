@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"log"
+	"os"
 )
 
 var areIPs bool
@@ -13,7 +16,12 @@ func init() {
 }
 
 func main() {
-	entries := flag.Args()
+	var entries []string
+	if len(flag.Args()) != 0 {
+		entries = flag.Args()
+	} else {
+		entries = readFromCli()
+	}
 
 	for _, e := range entries {
 		if areIPs {
@@ -22,6 +30,26 @@ func main() {
 			spitFqdn(e)
 		}
 	}
+}
+
+func readFromCli() []string {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	var lines []string
+	for {
+		scanner.Scan()
+		line := scanner.Text()
+		if len(line) == 0 {
+			break
+		}
+		lines = append(lines, line)
+	}
+
+	err := scanner.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return lines
 }
 
 func spitFqdn(domain string) {
